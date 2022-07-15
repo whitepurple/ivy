@@ -93,6 +93,8 @@ def matrix_power(
     return torch.linalg.matrix_power(x, n, out=out)
 
 
+matrix_power.unsupported_dtypes = ("float16",)
+
 # noinspection PyPep8Naming
 def matrix_rank(
     x: torch.Tensor,

@@ -49,18 +49,24 @@ def test_vector_to_skew_symmetric_matrix(
 
 # matrix_power
 @given(
-    input_dtype=helpers.list_of_length(st.sampled_from(ivy_np.valid_float_dtypes), 1),
+    dtype_x_axis=helpers.dtype_values_axis(
+        ivy_np.valid_numeric_dtypes,
+        min_num_dims=2,
+        max_num_dims=2,
+        min_dim_size=2,
+        max_dim_size=2,
+        min_axis=1,
+        max_axis=5,
+    ),
     as_variable=st.booleans(),
     with_out=st.booleans(),
-    num_positional_args=st.integers(0, 1),
+    num_positional_args=helpers.num_positional_args(fn_name="matrix_power"),
     native_array=st.booleans(),
     container=st.booleans(),
     instance_method=st.booleans(),
-    a=st.integers(1, 50),
-    n=st.integers(-10, 10),
 )
 def test_matrix_power(
-    input_dtype,
+    dtype_x_axis,
     as_variable,
     with_out,
     num_positional_args,
@@ -68,13 +74,11 @@ def test_matrix_power(
     container,
     instance_method,
     fw,
-    a,
-    n,
 ):
-    if "float16" in input_dtype:
-        return
+    dtype, x, n = dtype_x_axis
+
     helpers.test_function(
-        input_dtype,
+        dtype,
         as_variable,
         with_out,
         num_positional_args,
@@ -85,24 +89,27 @@ def test_matrix_power(
         "matrix_power",
         test_rtol=1e-02,
         test_atol=1e-02,
-        x=np.random.uniform(size=(a, a)).astype(input_dtype[0]),
+        x=np.asarray(x, dtype=dtype),
         n=n,
     )
 
 
 # matmul
 @given(
-    input_dtype=helpers.list_of_length(st.sampled_from(ivy_np.valid_numeric_dtypes), 2),
-    as_variable=helpers.list_of_length(st.booleans(), 2),
+    dtype_x_axis=helpers.dtype_and_values(
+        ivy_np.valid_float_dtypes,
+        n_arrays=2,
+        min_num_dims=2,
+        max_num_dims=2,
+        min_dim_size=2,
+        max_dim_size=2,
+    ),
+    as_variable=st.booleans(),
     with_out=st.booleans(),
-    num_positional_args=st.integers(0, 1),
-    native_array=helpers.list_of_length(st.booleans(), 2),
-    container=helpers.list_of_length(st.booleans(), 2),
+    num_positional_args=helpers.num_positional_args(fn_name="matmul"),
+    native_array=st.booleans(),
+    container=st.booleans(),
     instance_method=st.booleans(),
-    a=st.integers(1, 50),
-    b=st.integers(1, 50),
-    c=st.integers(1, 50),
-    seed=st.integers(0, 2**16 - 1),
 )
 def test_matmul(
     input_dtype,
