@@ -779,6 +779,7 @@ def test_function(
     fn_name: str,
     test_rtol: float = None,
     test_atol: float = 1e-06,
+    test_gradients: bool = False,
     test_values: bool = True,
     ground_truth_backend: str = "numpy",
     **all_as_kwargs_np,
@@ -815,6 +816,8 @@ def test_function(
         relative tolerance value.
     test_atol
         absolute tolerance value.
+    test_gradients
+        if True, test for the correctness of gradients.
     test_values
         if True, test for the correctness of the resulting values.
     ground_truth_backend
@@ -1021,6 +1024,15 @@ def test_function(
         ivy.unset_backend()
         raise e
     ivy.unset_backend()
+    # gradient test
+    if test_gradients:
+        if fw != "numpy":
+            ivy.set_backend("torch")
+            # gradient generation with torch
+            ivy.unset_backend()
+            ivy.set_backend(fw)
+            # gradient generation with given backend
+            ivy.unset_backend()
     # assuming value test will be handled manually in the test function
     if not test_values:
         return ret, ret_from_gt
@@ -1723,11 +1735,14 @@ def none_or_list_of_floats(
 
 @st.composite
 def get_mean_std(draw, *, dtype):
-    """Draws two integers representing the mean and standard deviation for a given data type.
+    """Draws two integers representing the mean and standard deviation for a given data
+    type.
+
     Parameters
     ----------
     draw
-        special function that draws data randomly (but is reproducible) from a given data-set (ex. list).
+        special function that draws data randomly (but is reproducible) from a given
+        data-set (ex. list).
     dtype
         data type.
 
@@ -1746,7 +1761,8 @@ def get_bounds(draw, *, dtype):
     Parameters
     ----------
     draw
-        special function that draws data randomly (but is reproducible) from a given data-set (ex. list).
+        special function that draws data randomly (but is reproducible) from a given
+        data-set (ex. list).
     dtype
         data type.
 
@@ -1779,7 +1795,8 @@ def get_axis(draw, *, shape, allow_none=False):
     Parameters
     ----------
     draw
-        special function that draws data randomly (but is reproducible) from a given data-set (ex. list).
+        special function that draws data randomly (but is reproducible) from a given
+        data-set (ex. list).
     shape
         shape of the array.
     allow_none
@@ -1825,13 +1842,14 @@ def get_axis(draw, *, shape, allow_none=False):
 
 @st.composite
 def num_positional_args(draw, *, fn_name: str = None):
-    """Draws an integers randomly from the minimum and maximum number of positional arguments
-    a given function can take.
+    """Draws an integers randomly from the minimum and maximum number of positional
+    arguments a given function can take.
 
     Parameters
     ----------
     draw
-        special function that draws data randomly (but is reproducible) from a given data-set (ex. list).
+        special function that draws data randomly (but is reproducible) from a given
+        data-set (ex. list).
     fn_name
         name of the function.
 
