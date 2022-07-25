@@ -272,8 +272,6 @@ def test_matrix_power(
         instance_method=instance_method,
         fw=fw,
         fn_name="matrix_power",
-        test_rtol=1e-02,
-        test_atol=1e-02,
         x=np.asarray(x, dtype=dtype),
         n=n,
     )
@@ -314,8 +312,6 @@ def test_matmul(
         instance_method=instance_method,
         fw=fw,
         fn_name="matmul",
-        test_rtol=5e-02,
-        test_atol=5e-02,
         x1=np.asarray(x_1, dtype=input_dtype1),
         x2=np.asarray(y_1, dtype=input_dtype2),
     )
@@ -352,8 +348,6 @@ def test_det(
         instance_method=instance_method,
         fw=fw,
         fn_name="det",
-        test_rtol=1e-03,
-        test_atol=1e-03,
         x=np.asarray(x, dtype=input_dtype),
     )
 
@@ -390,8 +384,6 @@ def test_eigh(
         instance_method=instance_method,
         fw=fw,
         fn_name="eigh",
-        test_rtol=1e-02,
-        test_atol=1e-02,
         x=x,
         test_values=False,
     )
@@ -442,8 +434,6 @@ def test_eigvalsh(
         instance_method=instance_method,
         fw=fw,
         fn_name="eigvalsh",
-        test_rtol=0.01,
-        test_atol=0.01,
         x=np.asarray(x, dtype=input_dtype),
     )
 
@@ -485,8 +475,6 @@ def test_inv(
         instance_method=instance_method,
         fw=fw,
         fn_name="inv",
-        test_rtol=1e-02,
-        test_atol=1e-02,
         x=np.asarray(x, dtype=input_dtype),
     )
 
@@ -609,8 +597,6 @@ def test_slogdet(
         fw=fw,
         fn_name="slogdet",
         x=np.asarray(x, dtype=input_dtype),
-        test_rtol=1e-3,
-        test_atol=1e-3,
     )
 
 
@@ -685,8 +671,6 @@ def test_solve(
         instance_method=instance_method,
         fw=fw,
         fn_name="solve",
-        test_rtol=1e-03,
-        test_atol=1e-03,
         x1=np.asarray(x1, dtype=input_dtype1),
         x2=np.asarray(x2, dtype=input_dtype2),
     )
@@ -1149,10 +1133,8 @@ def test_matrix_rank(
         instance_method=instance_method,
         fw=fw,
         fn_name="matrix_rank",
-        test_atol=1e-04,
-        test_rtol=1e-04,
         x=np.asarray(x, dtype=dtype),
-        rtol=rtol,
+        rtol=1e-04,
     )
 
 
@@ -1200,8 +1182,6 @@ def test_cholesky(
         instance_method=instance_method,
         fw=fw,
         fn_name="cholesky",
-        test_rtol=1e-02,
-        test_atol=1e-02,
         x=x,
         upper=upper,
     )
