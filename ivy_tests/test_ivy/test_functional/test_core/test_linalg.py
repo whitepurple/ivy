@@ -674,9 +674,9 @@ def test_svdvals(
     dtype_x1_x2_axis=_get_dtype_value1_value2_axis_for_tensordot(
         available_dtypes=ivy_np.valid_numeric_dtypes,
         min_num_dims=3,
-        max_num_dims=10,
+        max_num_dims=8,
         min_dim_size=1,
-        max_dim_size=50,
+        max_dim_size=15,
     ),
     as_variable=helpers.list_of_length(x=st.booleans(), length=2),
     with_out=st.booleans(),
