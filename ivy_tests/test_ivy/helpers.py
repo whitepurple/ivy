@@ -1019,20 +1019,70 @@ def test_function(
             )
             ivy.unset_backend()
             return
-        ret_from_gt = ivy.to_native(ivy.__dict__[fn_name](*args, **kwargs), nested=True)
+        ret_from_gt = ivy.__dict__[fn_name](*args, **kwargs)
     except Exception as e:
         ivy.unset_backend()
         raise e
     ivy.unset_backend()
     # gradient test
-    if test_gradients:
+    if (
+        test_gradients
+        and not any(container_flags)
+        and all(as_variable_flags)
+        and num_positional_args == 0
+    ):
+        # for
         if fw != "numpy":
+
+            def kwargs_to_container(kwargs):
+                return ivy.Container(
+                    {
+                        k: ivy.variable(ivy.array(v.tolist(), dtype=d))
+                        for (k, v), d in zip(kwargs.items(), input_dtypes)
+                    }
+                )
+
+            # not pass x as a container, only an array
+            # get y, grads
+            # pass a single array
+            # index the array --> nested_indices_where
+            # extract the indices of the arrays, put the
+            # arrays in the container (keys=0,1,2), call
+            # the gradient function
+            # with the executable which takes the container
+            # of arrays, pass others as normal, populate
+            # the array
+            # and pass them as keyword arguments and
+            # arguments and call the functions
+            # find all arrays in the output using nested
+            # where --> compute the mean of each arrays
+            # independently and then calculate the mean of
+            # all groups and return it
+            def func(kwargs):
+
+                return ivy.mean(ivy.__dict__[fn_name](**dict(kwargs)))
+
+            kwargs = ivy.Container(kwargs)
             ivy.set_backend("torch")
-            # gradient generation with torch
+            kwargs_torch = kwargs_to_container(kwargs)
+            grad = ivy.execute_with_gradients(func, xs=kwargs_torch)[1]
             ivy.unset_backend()
-            ivy.set_backend(fw)
             # gradient generation with given backend
+            ivy.set_backend(fw)
+            kwargs_fw = kwargs_to_container(kwargs)
+            grad_from_gt = ivy.execute_with_gradients(func, xs=kwargs_fw)[1]
             ivy.unset_backend()
+            # flattened array returns
+            grad_np_flat, grad_np_from_gt_flat = get_flattened_array_returns(
+                ret=grad, ret_from_gt=grad_from_gt
+            )
+            # value test
+            value_test(
+                ret_np_flat=grad_np_flat,
+                ret_from_np_flat=grad_np_from_gt_flat,
+                rtol=test_rtol,
+                atol=test_atol,
+            )
     # assuming value test will be handled manually in the test function
     if not test_values:
         return ret, ret_from_gt
